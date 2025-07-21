@@ -73,31 +73,31 @@ Performance benchmarks across different regions and cloud storage providers. All
 
 ### ListObjects Performance
 
-| Source Region | Tigris (Global) | Cloudflare R2 (Eastern Europe Hint) |
-|--------------|-----------------|--------------------------------------|
-| Berlin, Germany | Avg: 174ms, P90: 481ms, P99: 481ms | Avg: 174ms, P90: 481ms, P99: 481ms |
-| New York, USA | Avg: 589.8ms, P90: 778.2ms, P99: 1020.6ms | - |
+| Source Region | Tigris (Global) | Cloudflare R2 (Eastern Europe Hint) | Cloudflare R2 (US East Hint) |
+|--------------|-----------------|--------------------------------------|------------------------------|
+| Berlin, Germany | Avg: 174ms, P90: 481ms, P99: 481ms | Avg: 174ms, P90: 481ms, P99: 481ms | - |
+| New York, USA | Avg: 589.8ms, P90: 778.2ms, P99: 1020.6ms | - | Avg: 1123.4ms, P90: 1311.5ms, P99: 1510.0ms |
 
 ### PutObject Performance
 
-| Source Region | Tigris (Global) | Cloudflare R2 (Eastern Europe Hint) |
-|--------------|-----------------|--------------------------------------|
-| Berlin, Germany | Avg: 33ms, P90: 59ms, P99: 65ms | Avg: 201ms, P90: 262ms, P99: 406ms |
-| New York, USA | Avg: 24.7ms, P90: 28.1ms, P99: 51.3ms | - |
+| Source Region | Tigris (Global) | Cloudflare R2 (Eastern Europe Hint) | Cloudflare R2 (US East Hint) |
+|--------------|-----------------|--------------------------------------|------------------------------|
+| Berlin, Germany | Avg: 33ms, P90: 59ms, P99: 65ms | Avg: 201ms, P90: 262ms, P99: 406ms | - |
+| New York, USA | Avg: 24.7ms, P90: 28.1ms, P99: 51.3ms | - | Avg: 196.9ms, P90: 232.3ms, P99: 344.5ms |
 
 ### GetObject Performance
 
-| Source Region | Tigris (Global) | Cloudflare R2 (Eastern Europe Hint) |
-|--------------|-----------------|--------------------------------------|
-| Berlin, Germany | Avg: 15ms, P90: 16ms, P99: 22ms | Avg: 89ms, P90: 117ms, P99: 196ms |
-| New York, USA | Avg: 11.7ms, P90: 13.8ms, P99: 32.4ms | - |
+| Source Region | Tigris (Global) | Cloudflare R2 (Eastern Europe Hint) | Cloudflare R2 (US East Hint) |
+|--------------|-----------------|--------------------------------------|------------------------------|
+| Berlin, Germany | Avg: 15ms, P90: 16ms, P99: 22ms | Avg: 89ms, P90: 117ms, P99: 196ms | - |
+| New York, USA | Avg: 11.7ms, P90: 13.8ms, P99: 32.4ms | - | Avg: 89.8ms, P90: 119.4ms, P99: 278.5ms |
 
 ### DeleteObject Performance
 
-| Source Region | Tigris (Global) | Cloudflare R2 (Eastern Europe Hint) |
-|--------------|-----------------|--------------------------------------|
-| Berlin, Germany | Avg: 180ms, P90: 209ms, P99: 209ms | Avg: 180ms, P90: 209ms, P99: 209ms |
-| New York, USA | Avg: 572.5ms, P90: 720.4ms, P99: 1025.1ms | - |
+| Source Region | Tigris (Global) | Cloudflare R2 (Eastern Europe Hint) | Cloudflare R2 (US East Hint) |
+|--------------|-----------------|--------------------------------------|------------------------------|
+| Berlin, Germany | Avg: 180ms, P90: 209ms, P99: 209ms | Avg: 180ms, P90: 209ms, P99: 209ms | - |
+| New York, USA | Avg: 572.5ms, P90: 720.4ms, P99: 1025.1ms | - | Avg: 572.5ms, P90: 720.4ms, P99: 1025.1ms |
 
 ### Regional Performance Summary
 
@@ -105,6 +105,13 @@ Performance benchmarks across different regions and cloud storage providers. All
 - **Upload (PutObject)**: 24.7ms avg, 51.3ms P99, 408.78 ops/sec, 0.40 MiB/s
 - **Download (GetObject)**: 11.7ms avg, 32.4ms P99, 855.51 ops/sec, 0.84 MiB/s
 - **List Objects**: 589.8ms avg, 1020.6ms P99, 16,590.08 ops/sec
+- **Delete Objects**: 572.5ms avg, 1025.1ms P99, 1,746.36 ops/sec
+- **Reliability**: 100% success rate across all operations
+
+**New York, USA - Cloudflare R2 (US East Hint):**
+- **Upload (PutObject)**: 196.9ms avg, 344.5ms P99, 50.94 ops/sec, 0.05 MiB/s
+- **Download (GetObject)**: 89.8ms avg, 278.5ms P99, 110.50 ops/sec, 0.11 MiB/s
+- **List Objects**: 1123.4ms avg, 1510.0ms P99, 8,713.64 ops/sec
 - **Delete Objects**: 572.5ms avg, 1025.1ms P99, 1,746.36 ops/sec
 - **Reliability**: 100% success rate across all operations
 
@@ -131,8 +138,9 @@ Performance benchmarks across different regions and cloud storage providers. All
 - **List/Delete Operations**: Higher latency from New York (589ms vs 174ms) - likely due to global distribution overhead
 
 **Performance Winner:**
-- **Fastest Upload**: New York-Tigris (24.7ms vs Berlin-Tigris 33ms vs R2 201ms)
-- **Fastest Download**: New York-Tigris (11.7ms vs Berlin-Tigris 15ms vs R2 89ms)
+- **Fastest Upload**: New York-Tigris (24.7ms vs Berlin-Tigris 33ms vs R2-EE 201ms vs R2-US 196.9ms)
+- **Fastest Download**: New York-Tigris (11.7ms vs Berlin-Tigris 15ms vs R2-EE 89ms vs R2-US 89.8ms)
 - **Highest Throughput**: New York-Tigris (408.78 upload, 855.51 download ops/sec)
 - **Best Consistency**: Tigris maintains sub-35ms P99 across regions for basic operations
+- **R2 Regional Comparison**: US East hint shows similar performance to Eastern Europe hint from US location
 - **Global Edge Performance**: Tigris outperforms regional providers regardless of location
