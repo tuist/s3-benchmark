@@ -29,21 +29,14 @@ A high-performance S3 storage benchmarking tool using MinIO's warp that measures
 
    **Option 3: Task Runner**
    ```bash
-   deno task warp  # Uses .env configuration
+   ./warp-bench.sh  # Uses .env configuration
    ```
 
 ## Usage
 
-### Run Warp Benchmarks (Primary)
+### Run Warp Benchmarks
 ```bash
 ./warp-bench.sh
-# or
-deno task warp
-```
-
-### Custom Deno Tool (Alternative)
-```bash
-deno task start  # For detailed per-operation analysis
 ```
 
 ### Warp Benchmark Configuration
@@ -52,10 +45,11 @@ Configure via environment variables in `.env`:
 - `WARP_CONCURRENT` - Concurrent operations (default: 10) 
 - `WARP_SIZE` - Object size (default: 1KiB)
 
-### Deno Tool Options (Alternative)
-- `--iterations <number>` - Number of iterations (default: 10)
-- `--object-size <bytes>` - Object size in bytes (default: 1024)
-- Use `deno task start --help` for full options
+### Advanced Configuration
+Modify `warp-bench.sh` or set additional environment variables:
+- `WARP_DURATION` - Test duration (30s, 1m, 5m)
+- `WARP_CONCURRENT` - Parallel operations (1-100)
+- `WARP_SIZE` - Object size (1KiB, 1MiB, etc.)
 
 ## What It Measures
 
