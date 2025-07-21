@@ -1,6 +1,4 @@
 # Environment variables
 .env
 .env.*
-
-# Deno cache
-.deno/
+warp-*

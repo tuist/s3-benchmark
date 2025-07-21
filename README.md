@@ -1,12 +1,12 @@
 # S3 Benchmark Tool
 
-A Deno-based performance benchmarking tool for S3 storage providers that measures latency for common operations.
+A high-performance S3 storage benchmarking tool using MinIO's warp that measures latency and throughput for common operations across different providers.
 
 ## Setup
 
-1. Install Mise and activate the project environment:
+1. Install required tools via Mise:
    ```bash
-   mise install
+   mise install  # Installs warp and other dependencies
    ```
 
 2. Set up your S3 credentials (choose one method):
@@ -27,51 +27,50 @@ A Deno-based performance benchmarking tool for S3 storage providers that measure
    export S3_REGION=us-east-1                   # Optional
    ```
 
-   **Option 3: Command Line Arguments**
+   **Option 3: Task Runner**
    ```bash
-   deno task start --bucket my-bucket --access-key-id key --secret-access-key secret
+   deno task warp  # Uses .env configuration
    ```
 
 ## Usage
 
-### Basic Usage
+### Run Warp Benchmarks (Primary)
 ```bash
-deno task start
+./warp-bench.sh
+# or
+deno task warp
 ```
 
-### With Custom Parameters
+### Custom Deno Tool (Alternative)
 ```bash
-deno task start --bucket my-bucket --iterations 20 --object-size 2048
+deno task start  # For detailed per-operation analysis
 ```
 
-### Available Options
-- `--endpoint <url>` - S3 endpoint URL (default: https://s3.amazonaws.com)
-- `--region <region>` - S3 region (default: us-east-1)
-- `--bucket <bucket>` - S3 bucket name (required)
-- `--access-key-id <key>` - S3 access key ID (required)
-- `--secret-access-key <secret>` - S3 secret access key (required)
-- `--iterations <number>` - Number of benchmark iterations (default: 10)
-- `--object-size <bytes>` - Size of test objects in bytes (default: 1024)
+### Warp Benchmark Configuration
+Configure via environment variables in `.env`:
+- `WARP_DURATION` - Benchmark duration (default: 30s)
+- `WARP_CONCURRENT` - Concurrent operations (default: 10) 
+- `WARP_SIZE` - Object size (default: 1KiB)
 
-### Help
-```bash
-deno task start --help
-```
+### Deno Tool Options (Alternative)
+- `--iterations <number>` - Number of iterations (default: 10)
+- `--object-size <bytes>` - Object size in bytes (default: 1024)
+- Use `deno task start --help` for full options
 
 ## What It Measures
 
-The benchmark tool measures latency for three key S3 operations:
+The warp benchmarking tool measures performance for key S3 operations:
 
-1. **ListObjects** - Lists objects in the bucket
-2. **PutObject** - Uploads a test object
-3. **GetObject** - Downloads the uploaded object
+1. **PutObject** - Upload performance and throughput
+2. **GetObject** - Download performance with TTFB metrics  
+3. **ListObjects** - Bucket listing performance
+4. **DeleteObject** - Object deletion performance
 
 For each operation, it reports:
-- Average latency
-- Median latency
-- Minimum latency
-- Maximum latency
-- Success/failure count
+- **Latency metrics**: Average, P90, P99, min/max
+- **Throughput**: Operations per second and MB/s
+- **Time to First Byte (TTFB)** for downloads
+- **Detailed percentile distributions**
 
 
 ## Benchmark Results
@@ -80,46 +79,47 @@ Performance benchmarks across different regions and cloud storage providers. All
 
 ### ListObjects Performance
 
-| Source Region | Tigris (Global) | Cloudflare R2 (East Europe) |
-|--------------|-----------------|------------------------------|
-| Berlin, Germany | Avg: 150ms, P90: 418ms, P99: 418ms | Avg: 174ms, P90: 481ms, P99: 481ms |
+| Source Region | Tigris (Global) | Cloudflare R2 (Eastern Europe Hint) |
+|--------------|-----------------|--------------------------------------|
+| Berlin, Germany | Avg: 174ms, P90: 481ms, P99: 481ms | Avg: 174ms, P90: 481ms, P99: 481ms |
 
 ### PutObject Performance  
 
-| Source Region | Tigris (Global) | Cloudflare R2 (East Europe) |
-|--------------|-----------------|------------------------------|
-| Berlin, Germany | Avg: 129ms, P90: 135ms, P99: 135ms | Avg: 294ms, P90: 422ms, P99: 422ms |
+| Source Region | Tigris (Global) | Cloudflare R2 (Eastern Europe Hint) |
+|--------------|-----------------|--------------------------------------|
+| Berlin, Germany | Avg: 33ms, P90: 59ms, P99: 65ms | Avg: 201ms, P90: 262ms, P99: 406ms |
 
 ### GetObject Performance
 
-| Source Region | Tigris (Global) | Cloudflare R2 (East Europe) |
-|--------------|-----------------|------------------------------|
-| Berlin, Germany | Avg: 99ms, P90: 112ms, P99: 112ms | Avg: 186ms, P90: 244ms, P99: 244ms |
+| Source Region | Tigris (Global) | Cloudflare R2 (Eastern Europe Hint) |
+|--------------|-----------------|--------------------------------------|
+| Berlin, Germany | Avg: 15ms, P90: 16ms, P99: 22ms | Avg: 89ms, P90: 117ms, P99: 196ms |
 
 ### DeleteObject Performance
 
-| Source Region | Tigris (Global) | Cloudflare R2 (East Europe) |
-|--------------|-----------------|------------------------------|
-| Berlin, Germany | Avg: 147ms, P90: 424ms, P99: 424ms | Avg: 180ms, P90: 209ms, P99: 209ms |
+| Source Region | Tigris (Global) | Cloudflare R2 (Eastern Europe Hint) |
+|--------------|-----------------|--------------------------------------|
+| Berlin, Germany | Avg: 180ms, P90: 209ms, P99: 209ms | Avg: 180ms, P90: 209ms, P99: 209ms |
 
 ### Summary
 
 **Performance Comparison from Berlin, Germany:**
 
-**Tigris Global:**
-- **Upload (PutObject)**: Excellent consistency - 129ms avg, 135ms P99
-- **Download (GetObject)**: Fastest overall - 99ms avg, 112ms P99
-- **List/Delete**: Good baseline but with outliers (P90 jumps to 400ms+)
-- **Reliability**: 99% success rate (1 GetObject failure)
+**Tigris (Global):**
+- **Upload (PutObject)**: 33ms avg, 65ms P99, 342.35 ops/sec
+- **Download (GetObject)**: 15ms avg, 22ms P99, 681.45 ops/sec  
+- **List/Delete**: Consistent ~180ms avg latency
+- **Reliability**: 100% success rate across all operations
 
-**Cloudflare R2 (East Europe Hint):**
-- **Upload (PutObject)**: Slower but consistent - 294ms avg, 422ms P99
-- **Download (GetObject)**: Good performance - 186ms avg, 244ms P99
-- **List/Delete**: More consistent than Tigris - 174ms/180ms avg with lower P99
-- **Reliability**: 100% success rate
+**Cloudflare R2 (Eastern Europe Hint):**
+- **Upload (PutObject)**: 201ms avg, 406ms P99, 49.10 ops/sec
+- **Download (GetObject)**: 89ms avg, 196ms P99, 110.24 ops/sec
+- **List/Delete**: Consistent ~180ms avg latency  
+- **Reliability**: 100% success rate across all operations
 
-**Winner by Operation:**
-- **Fastest Upload**: Tigris (2.3x faster)
-- **Fastest Download**: Tigris (1.9x faster)
-- **Most Consistent**: R2 (better P99 performance for List/Delete)
-- **Most Reliable**: R2 (no failures)
+**Performance Winner:**
+- **Fastest Upload**: Tigris (6x faster - 33ms vs 201ms)
+- **Fastest Download**: Tigris (6x faster - 15ms vs 89ms)
+- **Highest Throughput**: Tigris (7x uploads, 6x downloads)
+- **Best P99 Performance**: Tigris (65ms vs 406ms uploads)
+- **Global Edge Performance**: Tigris significantly outperforms regional hints

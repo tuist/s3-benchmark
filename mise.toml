@@ -1,2 +1,3 @@
 [tools]
 deno = "2.3.3"
+"ubi:minio/warp" = "1.2.0"
